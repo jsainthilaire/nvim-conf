@@ -32,4 +32,6 @@ return require('packer').startup(function(use)
       'hrsh7th/vim-vsnip-integ'
     }
   }
+
+  use 'marko-cerovac/material.nvim'
 end)

@@ -19,3 +19,4 @@ require('keybindings')
 require('autocommands')
 
 require('config.completion')
+require('config.theme')
