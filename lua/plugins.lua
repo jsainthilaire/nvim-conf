@@ -34,4 +34,13 @@ return require('packer').startup(function(use)
   }
 
   use 'marko-cerovac/material.nvim'
+  use {
+    'hoob3rt/lualine.nvim',
+    requires = {'kyazdani42/nvim-web-devicons', opt = true},
+    config = function()
+      require('lualine').setup{
+        options = {theme = 'material'}
+      }
+    end
+  }
 end)

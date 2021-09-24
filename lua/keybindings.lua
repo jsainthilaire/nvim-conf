@@ -23,3 +23,4 @@ utils.map('n', '∆', ':resize -2<CR>')
 utils.map('n', '˚', ':resize +2<CR>')
 utils.map('n', '˙', ':vertical resize -2<CR>')
 utils.map('n', '¬', ':vertical resize +2<CR>')
+
