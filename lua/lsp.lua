@@ -47,12 +47,41 @@ local function setup_servers()
         },
         on_attach = on_attach
       }
+    elseif server == 'efm' then
+      require"lspconfig"[server].setup {
+        init_options = {documentFormatting = true},
+        filetypes = {"python"},
+        settings = {
+            rootMarkers = {".git/"},
+            languages = {
+                python = {
+                    {
+                        formatCommand = "black --quiet -",
+                        formatStdin = true,
+                    }
+                }
+            }
+        }
+      }
     else
       require'lspconfig'[server].setup{
         on_attach = on_attach
       }
     end
   end
+
+  function format()
+    --local utils = require('utils')
+   -- utils.opt('o', 'autoread', true)
+    vim.lsp.buf.formatting_sync(nil, 500)
+  end
+
+  vim.api.nvim_exec([[
+    augroup autoFormatGroup
+	    autocmd BufWritePre *.go,*.py lua vim.lsp.buf.formatting_sync(nil, 500) 
+    augroup END
+  ]], true)
+
 end
 
 setup_servers()
