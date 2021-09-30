@@ -24,3 +24,6 @@ utils.map('n', '˚', ':resize +2<CR>')
 utils.map('n', '˙', ':vertical resize -2<CR>')
 utils.map('n', '¬', ':vertical resize +2<CR>')
 
+utils.map('n', '<Leader>tt', ':NvimTreeToggle<CR>', silentOpts)
+utils.map('n', '<Leader>tr', ':NvimTreeRefresh<CR>', silentOpts)
+utils.map('n', '<Leader>tf', ':NvimTreeFindFile<CR>', silentOpts)
