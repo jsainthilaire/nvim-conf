@@ -21,6 +21,7 @@ utils.opt('w', 'relativenumber', true)
 utils.opt('w', 'signcolumn', 'yes')
 
 utils.opt('o', 'clipboard','unnamed,unnamedplus')
+utils.opt('o', 'mouse','a')
 
 utils.opt('o', 'splitbelow', true)
 utils.opt('o', 'splitright', true)
