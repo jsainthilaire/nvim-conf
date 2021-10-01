@@ -49,4 +49,10 @@ return require('packer').startup(function(use)
     requires = 'kyazdani42/nvim-web-devicons',
     config = function() require'nvim-tree'.setup {} end
   }
+
+  -- React ones
+  use {'peitalin/vim-jsx-typescript'}
+  use {'mlaursen/vim-react-snippets'}
+  use {'neoclide/vim-jsx-improve'}
+  use {'jose-elias-alvarez/nvim-lsp-ts-utils', after = {'nvim-treesitter'}}
 end)
