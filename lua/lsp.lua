@@ -17,6 +17,37 @@ local on_attach = function(client, bufnr)
 
 end
 
+-- Python virtual env setup
+local util = require('lspconfig/util')
+
+local path = util.path
+
+-- TODO: move all python conf to a separate file
+local function get_python_path(workspace)
+  if vim.env.VIRTUAL_ENV then
+    return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
+  end
+
+  local match = vim.fn.glob(path.join(workspace, 'poetry.lock'))
+  if match ~= '' then
+    local venv = vim.fn.trim(vim.fn.system('poetry env info -p'))
+    return path.join(venv, 'bin', 'python')
+  end
+
+  -- use python system version
+  return vim.fn.exepath('python') or 'python'
+end
+
+local function get_python_extra_paths(workspace)
+   local match = vim.fn.glob(path.join(workspace, 'poetry.lock'))
+    if match ~= '' then
+      local extraPaths = vim.fn.trim(vim.fn.system('poetry env info -p'))
+      -- TODO; make python version configurable
+      return path.join(extraPaths, 'lib', 'python3.8', 'site-packages')
+    end
+end
+
+
 local function setup_servers()
   require'lspinstall'.setup()
 
@@ -47,22 +78,25 @@ local function setup_servers()
         },
         on_attach = on_attach
       }
-    elseif server == 'efm' then
-      require"lspconfig"[server].setup {
-        init_options = {documentFormatting = true},
-        filetypes = {"python"},
+    elseif server == 'python' then
+      require'lspconfig'[server].setup{
         settings = {
-            rootMarkers = {".git/"},
-            languages = {
-                python = {
-                    {
-                        formatCommand = "black --quiet -",
-                        formatStdin = true,
-                    }
-                }
-            }
-        }
+          python = {
+            analysis = {
+              typeCheckingMode = "off",
+            },
+          },
+        },
+        on_init = function(client)
+          local workspace = client.config.root_dir
+          local settings = client.config.settings.python
+
+          settings.pythonPath = get_python_path(workspace)
+          settings.extraPaths = get_python_extra_paths(workspace)
+        end,
+        on_attach = on_attach
       }
+    elseif server == 'efm' then
     else
       require'lspconfig'[server].setup{
         on_attach = on_attach
@@ -78,7 +112,7 @@ local function setup_servers()
 
   vim.api.nvim_exec([[
     augroup autoFormatGroup
-	    autocmd BufWritePre *.go,*.py lua vim.lsp.buf.formatting_sync(nil, 500) 
+	    autocmd BufWritePre *.go lua vim.lsp.buf.formatting_sync(nil, 500) 
     augroup END
   ]], true)
 

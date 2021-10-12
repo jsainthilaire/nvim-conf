@@ -29,3 +29,5 @@ utils.opt('o', 'splitright', true)
 utils.opt('o', 'updatetime', 300)
 utils.opt('o', 'timeoutlen', 500)
 
+utils.opt('o', 'listchars', 'eol:$,tab:>-,trail:~,space:·')
+
