@@ -22,8 +22,11 @@ return require('packer').startup(function(use)
   }
 
           -- LSP config
-  use {'neovim/nvim-lspconfig'}
-  use {'kabouzeid/nvim-lspinstall'}
+  use {
+    'neovim/nvim-lspconfig',
+    'williamboman/nvim-lsp-installer',
+  }
+
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   use {
     'hrsh7th/nvim-compe',

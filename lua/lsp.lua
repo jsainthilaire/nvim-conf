@@ -1,3 +1,5 @@
+local lsp_installer = require("nvim-lsp-installer")
+
 local on_attach = function(client, bufnr)
     local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
     local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
@@ -48,7 +50,71 @@ local function get_python_extra_paths(workspace)
 end
 
 
+
 local function setup_servers()
+  lsp_installer.on_server_ready(function(server)
+    local opts = {
+      on_attach = on_attach,
+    }
+
+    if server.name == "pyright" then
+      opts.settings = {
+        python = {
+          analysis = {
+              typeCheckingMode = "off",
+            },
+        },
+      }
+
+      opts.on_init = function(client)
+        local workspace = client.config.root_dir
+        local settings = client.config.settings.python
+        settings.pythonPath = get_python_path(workspace)
+        settings.extraPaths = get_python_extra_paths(workspace)
+      end
+    end
+
+    if server.name == "sumneko_lua" then
+      opts.settings = {
+        Lua = {
+          completion = {
+            keywordSnippet = "Disable",
+          },
+          diagnostics = {
+            globals = {"vim", "use"},
+            disable = {"lowercase-global"}
+          },
+          runtime = {
+            version = "LuaJIT",
+            path = vim.split(package.path, ";"),
+          },
+          workspace = {
+            library = {
+              [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+              [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+            },
+          },
+        },
+      }
+    end
+
+    server:setup(opts)
+  end)
+
+  function format()
+    --local utils = require('utils')
+    -- utils.opt('o', 'autoread', true)
+    vim.lsp.buf.formatting_sync(nil, 500)
+  end
+
+  vim.api.nvim_exec([[
+    augroup autoFormatGroup
+	    autocmd BufWritePre *.go lua vim.lsp.buf.formatting_sync(nil, 500) 
+    augroup END
+  ]], true)
+end
+
+local function _setup_servers_old_deprecated()
   require'lspinstall'.setup()
 
   local servers = require'lspinstall'.installed_servers()
@@ -119,10 +185,4 @@ local function setup_servers()
 end
 
 setup_servers()
-
--- Automatically reload after `:LspInstall <server>` so we don't have to restart neovim
-require'lspinstall'.post_install_hook = function ()
-  setup_servers() -- reload installed servers
-  vim.cmd("bufdo e") -- this triggers the FileType autocmd that starts the server
-end
 
