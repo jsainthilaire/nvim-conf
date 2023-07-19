@@ -80,6 +80,13 @@ function M.setup()
       end
     }
 
+--    use {
+--      'folke/neodev.nvim',
+--      config = function()
+--        require('neodev').setup{}
+--      end
+--    }
+
     -- LSP config
     use {
       "neovim/nvim-lspconfig",
@@ -90,9 +97,9 @@ function M.setup()
         "mason-lspconfig.nvim",
         "mason-tool-installer.nvim",
         "cmp-nvim-lsp",
-        "lua-dev.nvim",
         "vim-illuminate",
         "null-ls.nvim",
+  --      "folke/neodev.nvim",
         -- "lsp-format.nvim", -- to easily format on save
         "schemastore.nvim",
         "typescript.nvim",
@@ -106,7 +113,6 @@ function M.setup()
         "williamboman/mason-lspconfig.nvim",
         "WhoIsSethDaniel/mason-tool-installer.nvim",
         -- { "lvimuser/lsp-inlayhints.nvim", branch = "readme" },
-        "folke/lua-dev.nvim",
         "RRethy/vim-illuminate",
         "jose-elias-alvarez/null-ls.nvim",
         --"lukas-reineke/lsp-format.nvim",

@@ -15,7 +15,7 @@ local servers = {
       typeCheckingMode = "off",
     },
   },
-  sumneko_lua = {
+  lua_ls = {
     settings = {
       Lua = {
         runtime = {
@@ -33,7 +33,7 @@ local servers = {
           maxPreload = 2000,
           preloadFileSize = 50000,
         },
-        completion = { callSnippet = "Both" },
+        completion = { callSnippet = "Replace" },
         telemetry = { enable = false },
       },
     },
@@ -71,7 +71,13 @@ function M.on_attach(client, bufnr)
     vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
   end
 
-  require("aerial").on_attach(client, bufnr)
+  -- set aerial prev/next when aerial is attached to a buffer
+  require('aerial').setup({
+    on_attach = function(bufnr)
+      vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
+      vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
+  end
+})
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -88,7 +94,7 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
   },
 }
 
-M.capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
+M.capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 local opts = {
   on_attach = M.on_attach,
   capabilities = M.capabilities,

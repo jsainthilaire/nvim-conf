@@ -30,9 +30,9 @@ function M.setup(servers, options)
       local opts = vim.tbl_deep_extend("force", options, servers[server_name] or {})
       lspconfig[server_name].setup(opts)
     end,
-    ["sumneko_lua"] = function()
-      local opts = vim.tbl_deep_extend("force", options, servers["sumneko_lua"] or {})
-      lspconfig.sumneko_lua.setup(require("lua-dev").setup(opts))
+    ["lua_ls"] = function()
+--      local opts = vim.tbl_deep_extend("force", options, servers["lua_ls"] or {})
+--      lspconfig.lua_ls.setup(require("neodev").setup(opts))
     end,
     ["tsserver"] = function()
       local opts = vim.tbl_deep_extend("force", options, servers["tsserver"] or {})
