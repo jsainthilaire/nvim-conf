@@ -17,104 +17,90 @@ function M.setup()
     },
   }
 
-  local function packer_init()
-    local fn = vim.fn
-    local install_path = fn.stdpath "data" .. "/site/pack/packer/start/packer.nvim"
-    if fn.empty(fn.glob(install_path)) > 0 then
-      packer_bootstrap = fn.system {
+  local function lazy_init()
+    local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+    if not vim.loop.fs_stat(lazypath) then
+      vim.fn.system({
         "git",
         "clone",
-        "--depth",
-        "1",
-        "https://github.com/wbthomason/packer.nvim",
-        install_path,
-      }
-      vim.cmd [[packadd packer.nvim]]
+        "--filter=blob:none",
+        "https://github.com/folke/lazy.nvim.git",
+        "--branch=stable", -- latest stable release
+        lazypath,
+      })
     end
-
-    local packer_grp = vim.api.nvim_create_augroup("packer_user_config", { clear = true })
-    vim.api.nvim_create_autocmd(
-      { "BufWritePost" },
-      { pattern = "init.lua", command = "source <afile> | PackerCompile", group = packer_grp }
-    )
+    vim.opt.rtp:prepend(lazypath)
   end
 
-  local function plugins(use)
-    use {'wbthomason/packer.nvim'}
-    use { "lewis6991/impatient.nvim" }
+  local function plugins()
+    return {
+    {'wbthomason/packer.nvim'},
+    { "lewis6991/impatient.nvim" },
 
-    use 'tpope/vim-commentary'
+    'tpope/vim-commentary',
 
-    use { "junegunn/fzf" }
-    use {
-      {
+    { "junegunn/fzf" },
+    {
         'nvim-telescope/telescope.nvim',
-        requires = {
+        dependencies = {
           'nvim-lua/popup.nvim',
           'nvim-lua/plenary.nvim',
           'telescope-fzf-native.nvim',
-        }
-      },
+          'aerial.nvim'
+        },
+        config = function() 
+          require('telescope').setup {
+            fzf = {fuzzy = true, override_generic_sorter = false, override_file_sorter = true, case_mode = "smart_case" }
+          }
+          require('telescope').load_extension('fzf')
+        end,
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        run = 'make',
+        build = 'make',
       },
       wants = {
-        'aerial.nvim'
       }
-    }
+    },
 
-    use {
+    {
       "stevearc/aerial.nvim",
       config = function()
         require("aerial").setup()
       end,
       module = { "aerial" },
       cmd = { "AerialToggle" },
-    }
+    },
 
-    use {
+    {
       'lewis6991/gitsigns.nvim',
       config = function()
         require('gitsigns').setup()
       end
-    }
-
---    use {
---      'folke/neodev.nvim',
---      config = function()
---        require('neodev').setup{}
---      end
---    }
+    },
 
     -- LSP config
-    use {
+    {
       "neovim/nvim-lspconfig",
       opt = true,
       event = { "BufReadPre" },
       wants = {
-        "mason.nvim",
-        "mason-lspconfig.nvim",
-        "mason-tool-installer.nvim",
-        "cmp-nvim-lsp",
-        "vim-illuminate",
-        "null-ls.nvim",
-  --      "folke/neodev.nvim",
-        -- "lsp-format.nvim", -- to easily format on save
-        "schemastore.nvim",
-        "typescript.nvim",
-        "goto-preview",
+
       },
       config = function()
         require("config.lsp").setup()
       end,
-      requires = {
+      dependencies = {
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
         "WhoIsSethDaniel/mason-tool-installer.nvim",
+        "hrsh7th/nvim-cmp",
+  --      "folke/neodev.nvim",
+        -- "lsp-format.nvim", -- to easily format on save
+        "schemastore.nvim",
+        "typescript.nvim",
         -- { "lvimuser/lsp-inlayhints.nvim", branch = "readme" },
         "RRethy/vim-illuminate",
-        "jose-elias-alvarez/null-ls.nvim",
+        {"jose-elias-alvarez/null-ls.nvim", dependencies = {'nvim-lua/plenary.nvim'}},
         --"lukas-reineke/lsp-format.nvim",
         {
           "j-hui/fidget.nvim",
@@ -131,18 +117,17 @@ function M.setup()
           end,
         },
       },
-    }
+    },
 
     -- Completion
-    use {
+    {
       "hrsh7th/nvim-cmp",
       event = "InsertEnter",
       opt = true,
       config = function()
         require("config.cmp").setup()
       end,
-      wants = { "LuaSnip" },
-      requires = {
+      dependencies = {
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
         "hrsh7th/cmp-nvim-lua",
@@ -153,17 +138,17 @@ function M.setup()
         "hrsh7th/cmp-nvim-lsp-signature-help",
         {
           "L3MON4D3/LuaSnip",
-          wants = { "friendly-snippets", "vim-snippets" },
-          config = function()
-            -- require("config.snip").setup()
-          end,
+          -- follow latest release.
+          version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+          -- install jsregexp (optional!).
+          build = "make install_jsregexp"
         },
         "rafamadriz/friendly-snippets",
         "honza/vim-snippets",
       },
-    }
+    },
 
-    use {
+    {
       "windwp/nvim-autopairs",
       opt = true,
       event = "InsertEnter",
@@ -172,22 +157,26 @@ function M.setup()
       config = function()
         require("config.autopairs").setup()
       end,
-    }
+    },
 
-    use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-    use 'marko-cerovac/material.nvim'
-    use 'navarasu/onedark.nvim'
+    { 
+      'nvim-treesitter/nvim-treesitter', 
+      build = ':TSUpdate',
+      dependencies = {
+        "jose-elias-alvarez/nvim-lsp-ts-utils",
+        {
+          "nvim-lualine/lualine.nvim", 
+          dependencies = "nvim-web-devicons", 
+          config = function()
+            require("config.lualine").setup()
+          end,
+        },
+      }
+    },
+    'marko-cerovac/material.nvim',
+    'navarasu/onedark.nvim',
 
-    use {
-      "nvim-lualine/lualine.nvim",
-      after = "nvim-treesitter",
-      config = function()
-        require("config.lualine").setup()
-      end,
-      wants = "nvim-web-devicons",
-    }
-
-    use {
+    {
       "danymat/neogen",
       config = function()
         require("config.neogen").setup()
@@ -195,43 +184,34 @@ function M.setup()
       cmd = { "Neogen" },
       module = "neogen",
       disable = false,
-    }
+    },
 
-    use {
+    {
       'kyazdani42/nvim-tree.lua',
-      requires = 'kyazdani42/nvim-web-devicons',
+      dependencies = 'kyazdani42/nvim-web-devicons',
       config = function() require'nvim-tree'.setup {} end
-    }
+    },
 
     -- React ones
-    use {'peitalin/vim-jsx-typescript'}
-    use {'mlaursen/vim-react-snippets'}
-    use {'neoclide/vim-jsx-improve'}
-    use {'jose-elias-alvarez/nvim-lsp-ts-utils', after = {'nvim-treesitter'}}
+    {'peitalin/vim-jsx-typescript'},
+    {'mlaursen/vim-react-snippets'},
+    {'neoclide/vim-jsx-improve'},
 
-    use {
+    {
       "folke/which-key.nvim",
       config = function()
         require("which-key").setup {}
       end
-    }
-
-
-    if packer_bootstrap then
-      print "Restart Neovim required after installation!"
-      require("packer").sync()
-    end
+    },
+  }
   end
 
-  packer_init()
-  local packer = require "packer"
+  lazy_init()
+  require("lazy").setup(plugins())
 
   -- Performance
   pcall(require, "impatient")
   -- pcall(require, "packer_compiled")
-
-  packer.init(conf)
-  packer.startup(plugins)
 end
 
 return M
