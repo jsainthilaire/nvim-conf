@@ -59,6 +59,7 @@ local servers = {
   bashls = {},
   emmet_ls = {},
   marksman = {},
+  solc = {},
 }
 
 function M.on_attach(client, bufnr)

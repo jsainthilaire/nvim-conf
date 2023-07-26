@@ -23,7 +23,7 @@ function M.setup()
     diagnostic = {
       -- virtual_text = false,
       -- virtual_text = { spacing = 4, prefix = "●" },
-      virtual_text = { severity = vim.diagnostic.severity.ERROR },
+      virtual_text = { severity = vim.diagnostic.severity.WARN },
       signs = {
         active = signs,
       },

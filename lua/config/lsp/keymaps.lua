@@ -10,7 +10,7 @@ local function keymappings(client, bufnr)
   keymap("n", "K", vim.lsp.buf.hover, { buffer = bufnr })
   keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  keymap('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
   keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
@@ -38,15 +38,17 @@ local function keymappings(client, bufnr)
     keymap_l.l.F = { "<cmd>lua vim.lsp.buf.format({async = true})<CR>", "Format Document" }
   end
 
-  local keymap_g = {
+  local keymap_g_p = {
     name = "Goto",
     -- d = { "<Cmd>lua vim.lsp.buf.definition()<CR>", "Definition" },
-    d = { "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", "Definition" },
-    D = { "<Cmd>lua vim.lsp.buf.declaration()<CR>", "Declaration" },
+    d = { "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", "GoTo Definition" },
+    t = {"<cmd>lua require('goto-preview').goto_preview_type_definition()<CR>", "GoTo Type Definition"},
+    i = { "cmd>lua require('goto-preview').goto_preview_implementation()<CR>", "Goto Implementation" },
     h = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", "Signature Help" },
-    I = { "<cmd>Telescope lsp_implementations<CR>", "Goto Implementation" },
+    r = { "cmd>lua require('goto-preview').goto_preview_references()<CR>", "GoTo References" },
+    I = { "<cmd>Telescope lsp_implementations<CR>", "Telescope Implementation" },
+    c = { "<cmd>lua require('goto-preview').close_all_win()<CR>", "Goto Close all" },
     -- b = { "<cmd>lua vim.lsp.buf.type_definition()<CR>", "Goto Type Definition" },
-    b = { "<cmd>lua require('goto-preview').goto_preview_type_definition()<CR>", "Goto Type Definition" },
   }
 
   local keymap_v_l = {
@@ -62,8 +64,8 @@ local function keymappings(client, bufnr)
   o = { mode = "v", buffer = bufnr, prefix = "<leader>" }
   whichkey.register(keymap_v_l, o)
 
-  o = { buffer = bufnr, prefix = "g" }
-  whichkey.register(keymap_g, o)
+  o = { buffer = bufnr, prefix = "gp" }
+  whichkey.register(keymap_g_p, o)
 end
 
 function M.setup(client, bufnr)

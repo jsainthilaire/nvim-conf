@@ -127,7 +127,8 @@ function M.setup()
         {
           "rmagatti/goto-preview",
           config = function()
-            require("goto-preview").setup {}
+            require("goto-preview").setup {
+            }
           end,
         },
       },
@@ -201,6 +202,12 @@ function M.setup()
       'kyazdani42/nvim-tree.lua',
       requires = 'kyazdani42/nvim-web-devicons',
       config = function() require'nvim-tree'.setup {} end
+    }
+
+    use {
+      "folke/trouble.nvim",
+      requires = "kyazdani42/nvim-web-devicons",
+      config = function() require("trouble").setup {} end
     }
 
     -- React ones
